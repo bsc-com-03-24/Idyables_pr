@@ -12,6 +12,7 @@ const app_controller_1 = require("./app.controller");
 const app_service_1 = require("./app.service");
 const payment_module_1 = require("./payment/payment.module");
 const orders_module_1 = require("./orders/orders.module");
+const users_module_1 = require("./users/users.module");
 const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
 let AppModule = class AppModule {
@@ -23,22 +24,15 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
-            typeorm_1.TypeOrmModule.forRootAsync({
-                imports: [config_1.ConfigModule],
-                useFactory: (configService) => ({
-                    type: 'oracle',
-                    host: configService.get('DB_HOST'),
-                    port: parseInt(configService.get('DB_PORT') ?? '1521'),
-                    username: configService.get('DB_USERNAME'),
-                    password: configService.get('DB_PASSWORD'),
-                    serviceName: configService.get('DB_SERVICE_NAME'),
-                    synchronize: configService.get('DB_SYNCHRONIZE') === 'true',
-                    autoLoadEntities: true,
-                }),
-                inject: [config_1.ConfigService],
+            typeorm_1.TypeOrmModule.forRoot({
+                type: 'better-sqlite3',
+                database: 'idyables_dev.db',
+                synchronize: true,
+                autoLoadEntities: true,
             }),
             payment_module_1.PaymentModule,
             orders_module_1.OrdersModule,
+            users_module_1.UsersModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],
