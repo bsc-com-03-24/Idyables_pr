@@ -24,11 +24,19 @@ exports.AppModule = AppModule = __decorate([
             config_1.ConfigModule.forRoot({
                 isGlobal: true,
             }),
-            typeorm_1.TypeOrmModule.forRoot({
-                type: 'better-sqlite3',
-                database: 'idyables_dev.db',
-                synchronize: true,
-                autoLoadEntities: true,
+            typeorm_1.TypeOrmModule.forRootAsync({
+                imports: [config_1.ConfigModule],
+                inject: [config_1.ConfigService],
+                useFactory: (configService) => ({
+                    type: 'oracle',
+                    host: configService.get('DB_HOST'),
+                    port: parseInt(configService.get('DB_PORT') || '1521'),
+                    username: configService.get('DB_USERNAME'),
+                    password: configService.get('DB_PASSWORD'),
+                    serviceName: configService.get('DB_SERVICE_NAME'),
+                    synchronize: configService.get('DB_SYNCHRONIZE') === 'true',
+                    autoLoadEntities: true,
+                }),
             }),
             payment_module_1.PaymentModule,
             orders_module_1.OrdersModule,
