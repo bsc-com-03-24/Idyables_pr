@@ -16,14 +16,13 @@ exports.PaymentController = void 0;
 const common_1 = require("@nestjs/common");
 const payment_service_1 = require("./payment.service");
 const create_payment_dto_1 = require("./dto/create-payment.dto");
-const update_payment_dto_1 = require("./dto/update-payment.dto");
 let PaymentController = class PaymentController {
     paymentService;
     constructor(paymentService) {
         this.paymentService = paymentService;
     }
-    create(createPaymentDto) {
-        return this.paymentService.create(createPaymentDto);
+    initiatePayment(createPaymentDto) {
+        return this.paymentService.initiatePayment(createPaymentDto);
     }
     findAll() {
         return this.paymentService.findAll();
@@ -31,11 +30,14 @@ let PaymentController = class PaymentController {
     findOne(id) {
         return this.paymentService.findOne(+id);
     }
-    update(id, updatePaymentDto) {
-        return this.paymentService.update(+id, updatePaymentDto);
+    findByOrder(orderId) {
+        return this.paymentService.findByOrder(+orderId);
     }
-    remove(id) {
-        return this.paymentService.remove(+id);
+    confirmCash(id) {
+        return this.paymentService.confirmCashPayment(+id);
+    }
+    refundPayment(id) {
+        return this.paymentService.refundPayment(+id);
     }
 };
 exports.PaymentController = PaymentController;
@@ -45,7 +47,7 @@ __decorate([
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [create_payment_dto_1.CreatePaymentDto]),
     __metadata("design:returntype", void 0)
-], PaymentController.prototype, "create", null);
+], PaymentController.prototype, "initiatePayment", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -60,20 +62,26 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PaymentController.prototype, "findOne", null);
 __decorate([
-    (0, common_1.Patch)(':id'),
-    __param(0, (0, common_1.Param)('id')),
-    __param(1, (0, common_1.Body)()),
+    (0, common_1.Get)('order/:orderId'),
+    __param(0, (0, common_1.Param)('orderId')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, update_payment_dto_1.UpdatePaymentDto]),
+    __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], PaymentController.prototype, "update", null);
+], PaymentController.prototype, "findByOrder", null);
 __decorate([
-    (0, common_1.Delete)(':id'),
+    (0, common_1.Patch)(':id/confirm-cash'),
     __param(0, (0, common_1.Param)('id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
-], PaymentController.prototype, "remove", null);
+], PaymentController.prototype, "confirmCash", null);
+__decorate([
+    (0, common_1.Patch)(':id/refund'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], PaymentController.prototype, "refundPayment", null);
 exports.PaymentController = PaymentController = __decorate([
     (0, common_1.Controller)('payment'),
     __metadata("design:paramtypes", [payment_service_1.PaymentService])
