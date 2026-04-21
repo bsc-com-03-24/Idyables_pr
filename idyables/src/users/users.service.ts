@@ -1,38 +1,41 @@
-import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { CreateUserDto } from './dto/create-user.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()
 export class UsersService {
-
   constructor(
     @InjectRepository(User)
-    private readonly userRepository: Repository<User>,
+    private usersRepository: Repository<User>,
   ) {}
 
-  // checks if email exists
-  async findByEmail(email: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { email } });
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = this.usersRepository.create(createUserDto);
+    return await this.usersRepository.save(user);
   }
 
-  // checks if username exists
-  async findByUsername(username: string): Promise<User | null> {
-    return this.userRepository.findOne({ where: { username } });
+  async findAll(): Promise<User[]> {
+    return await this.usersRepository.find();
   }
 
-  //returns the users profile
-  async findById(id: number): Promise<User> {
-    const user = await this.userRepository.findOne({ where: { id } });
-    if (!user) {
-      throw new NotFoundException(`User not found`);
-    }
+  async findOne(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) throw new NotFoundException(`User with id ${id} not found`);
     return user;
   }
 
-  //save the new user
-  async create(data: Partial<User>): Promise<User> {
-    const user = this.userRepository.create(data);
-    return this.userRepository.save(user);
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+    await this.findOne(id);
+    await this.usersRepository.update(id, updateUserDto);
+    return await this.findOne(id);
+  }
+
+  async remove(id: number): Promise<{ message: string }> {
+    await this.findOne(id);
+    await this.usersRepository.delete(id);
+    return { message: `User ${id} deleted successfully` };
   }
 }
