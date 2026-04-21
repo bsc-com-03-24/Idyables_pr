@@ -5,7 +5,7 @@ import { PaymentModule } from './payment/payment.module';
 import { OrdersModule } from './orders/orders.module';
 import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -14,11 +14,19 @@ import { ConfigModule } from '@nestjs/config';
       isGlobal: true,
     }),
     // SQLite for local development — swap back to Oracle before submission
-    TypeOrmModule.forRoot({
-      type: 'better-sqlite3',
-      database: 'idyables_dev.db',
-      synchronize: true,
-      autoLoadEntities: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'oracle',
+        host: configService.get('DB_HOST'),
+        port: parseInt(configService.get('DB_PORT') || '1521'),
+        username: configService.get('DB_USERNAME'),
+        password: configService.get('DB_PASSWORD'),
+        serviceName: configService.get('DB_SERVICE_NAME'),
+        synchronize: configService.get('DB_SYNCHRONIZE') === 'true',
+        autoLoadEntities: true,
+      }),
     }),
     PaymentModule,
     OrdersModule,
