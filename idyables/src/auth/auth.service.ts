@@ -21,7 +21,7 @@ export class AuthService {
       username: user.username, 
       sub: user.id,
       role: user.role 
-    };
+    };//generate the token that is yeat to be verified
     return this.jwtService.sign(payload);
   }
   async register(registerDTO: RegisterDto): Promise<any> {

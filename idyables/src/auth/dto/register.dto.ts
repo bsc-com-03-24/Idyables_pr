@@ -2,14 +2,14 @@ import { IsEnum, IsString, IsEmail } from 'class-validator';
 
 export class RegisterDto {
   @IsString()
-  username: string;
+  username!: string;
 
   @IsEmail()
-  email: string;
+  email!: string;
 
   @IsEnum(['customer','food vendor','delivery_personel'])
-  role: string;
+  role!: string;
 
   @IsString()
-  password: string;
+  password!: string;
 }

@@ -18,6 +18,8 @@ export class AuthController {
   login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto.username, loginDto.password);
   }
+ 
+  //add the logout endpoint n protect it
 
   @UseGuards(AuthGuard)
   @Get('profile')

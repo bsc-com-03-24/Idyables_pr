@@ -1,37 +1,38 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { User } from './entities/user.entity';
 
 @Injectable()
-export class UsersService {}
+export class UsersService {
 
-constructor(
-        
-        @InjectRepository(User)
-        private usersRepository: Repository<User>,
-        ) {}
+  constructor(
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
+  ) {}
 
-        async create(createUserDto: CreateUserDto): Promise<User> {
-        const user = this.usersRepository.create(createUserDto);
-        return await this.usersRepository.save(user);
-        }
+  // checks if email exists
+  async findByEmail(email: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { email } });
+  }
 
-        async findAll(): Promise<User[]> {
-        return await this.usersRepository.find();
-        }
+  // checks if username exists
+  async findByUsername(username: string): Promise<User | null> {
+    return this.userRepository.findOne({ where: { username } });
+  }
 
-        async findOne(id: number): Promise<User> {
-        const user = await this.usersRepository.findOne({ where: { id } });
-        if (!user) throw new NotFoundException(`User with id ${id} not found`);
-        return user;
-        }
+  //returns the users profile
+  async findById(id: number): Promise<User> {
+    const user = await this.userRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User not found`);
+    }
+    return user;
+  }
 
-        async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-        await this.findOne(id);
-        await this.usersRepository.update(id, updateUserDto);
-        return await this.findOne(id);
-        }
-
-        async remove(id: number): Promise<{ message: string }> {
-        await this.findOne(id);
-        await this.usersRepository.delete(id);
-        return { message: `User ${id} deleted successfully` };
-        }
+  //save the new user
+  async create(data: Partial<User>): Promise<User> {
+    const user = this.userRepository.create(data);
+    return this.userRepository.save(user);
+  }
+}
